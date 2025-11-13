@@ -1,21 +1,11 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import Image from "next/image";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { CTAButton } from "../ui/CTAButton";
 import { motionDefaults } from "@/lib/motion";
 import { useMediaQuery } from "@/lib/hooks";
-
-const Shuriken3D = dynamic(() => import("../visuals/Shuriken3D"), {
-  ssr: false,
-  loading: () => (
-    <div className="flex h-full items-center justify-center">
-      <div className="h-32 w-32 animate-pulse rounded-full border border-border/60" />
-    </div>
-  ),
-});
+import NinjaRunnerGame from "../games/NinjaRunnerGame";
 
 export const Hero = () => {
   const isMobile = useMediaQuery("(max-width: 767px)");
@@ -74,17 +64,13 @@ export const Hero = () => {
             transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
           }}
         >
-          <div className="absolute inset-0">
-            {isMobile ? (
-              <Image
-                src="/images/shuriken-fallback.svg"
-                alt="Stylized shuriken representing the Coding Ninjas"
-                fill
-                priority
-              />
-            ) : (
-              <Shuriken3D className="h-full w-full" />
-            )}
+          <div className="absolute inset-0 flex items-center justify-center p-4">
+            <NinjaRunnerGame
+              width={isMobile ? 320 : 480}
+              height={isMobile ? 160 : 220}
+              showCaption={false}
+              spriteSrc="/images/NinjaRunner/spritesheet.png"
+            />
           </div>
           <div className="absolute bottom-6 left-6 right-6 rounded-2xl border border-border/60 bg-background/80 p-4 text-sm text-foreground/70 backdrop-blur-xl">
             <p className="font-semibold text-foreground">Coding Ninjas Pods</p>
