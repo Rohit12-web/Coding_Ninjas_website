@@ -1,3 +1,5 @@
+
+
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
@@ -59,30 +61,10 @@ export default function AboutUsPage() {
   const parallaxY = mousePosition.y * 0.01;
 
   return (
-    <main className="min-h-screen bg-black text-white font-sans overflow-x-hidden relative">
+    <main className="min-h-screen text-white font-sans overflow-x-hidden relative">
       {/* NINJA TECH TERMINAL OVERLAY */}
       <div className="fixed top-0 left-0 right-0 z-50 pointer-events-none">
         <div className="flex justify-between items-center px-4 sm:px-6 py-3 text-xs font-mono">
-          <motion.div
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="flex items-center gap-2"
-          >
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-            <span className="hidden xs:inline">SYSTEM: ONLINE</span>
-          </motion.div>
-          
-          <motion.div
-            key={connectionStatus}
-            initial={{ opacity: 0, x: 10 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-2"
-          >
-            {connectionStatus === "secure" && <Shield className="w-3 h-3 text-green-400" />}
-            {connectionStatus === "encrypted" && <GitBranch className="w-3 h-3 text-blue-400" />}
-            {connectionStatus === "stealth" && <Eye className="w-3 h-3 text-purple-400" />}
-            <span className="uppercase tracking-widest hidden sm:inline">{connectionStatus}</span>
-          </motion.div>
         </div>
       </div>
 
@@ -119,7 +101,7 @@ export default function AboutUsPage() {
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-            className="w-32 h-32 sm:w-40 sm:h-40 border-4 border-[#FF6C0C] rounded-3xl rotate-45 relative overflow-hidden bg-black/50 backdrop-blur-lg mx-auto"
+            className="w-32 h-32 sm:w-40 sm:h-40 border-4 border-[#FF6C0C] rounded-3xl rotate-45 relative overflow-hidden backdrop-blur-lg mx-auto"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-[#FF6C0C]/20 to-transparent" />
             <Sword className="absolute inset-0 m-auto w-12 h-12 sm:w-16 sm:h-16 text-[#FF6C0C] rotate-[-45deg]" />
@@ -231,7 +213,7 @@ export default function AboutUsPage() {
 </section>
 
       {/* Enhanced Foundation Section */}
-      <section id="pillars" className="relative py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-black via-gray-950 to-black overflow-hidden">
+      <section id="pillars" className="relative py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
   <motion.div
     initial={{ opacity: 0 }}
     whileInView={{ opacity: 0.15 }}
@@ -252,7 +234,7 @@ export default function AboutUsPage() {
               whileInView={{ scale: 1 }}
               viewport={{ once: true }}
               transition={{ type: "spring", damping: 20, delay: 0.2 }}
-              className="inline-flex items-center gap-4 sm:gap-6 px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl border border-[#FF6C0C] bg-black/50 backdrop-blur-xl mb-6 sm:mb-8"
+              className="inline-flex items-center gap-4 sm:gap-6 px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl border border-[#FF6C0C] backdrop-blur-xl mb-6 sm:mb-8"
             >
               <Zap className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-[#FF6C0C]" />
               <span className="text-lg sm:text-xl md:text-2xl font-bold text-[#FF6C0C] tracking-widest">
@@ -290,7 +272,7 @@ export default function AboutUsPage() {
         <motion.div
           key={member.name}
           initial={{ opacity: 0, y: 80, scale: 0.9 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ delay: index * 0.25, duration: 0.8, type: "spring" }}
           className="flex justify-center px-4 sm:px-5 lg:px-6"> {/* Increased side padding to match gap */}
@@ -308,7 +290,7 @@ export default function AboutUsPage() {
 
 
       {/* Enhanced Leadership Section */}
-      <section id="leadership" className="relative py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-black to-gray-900/50">
+      <section id="leadership" className="relative py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8">
   <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 80 }}
@@ -322,7 +304,7 @@ export default function AboutUsPage() {
               whileInView={{ scale: 1 }}
               viewport={{ once: true }}
               transition={{ type: "spring", delay: 0.2 }}
-              className="inline-flex items-center gap-4 sm:gap-6 px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl border border-[#FF6C0C] bg-black/50 backdrop-blur-xl mb-6 sm:mb-8"
+              className="inline-flex items-center gap-4 sm:gap-6 px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl border border-[#FF6C0C] backdrop-blur-xl mb-6 sm:mb-8"
             >
               <Cpu className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-[#FF6C0C]" />
               <span className="text-lg sm:text-xl md:text-2xl font-bold text-[#FF6C0C] tracking-widest">STRATEGIC COMMAND</span>
@@ -354,7 +336,7 @@ export default function AboutUsPage() {
         <motion.div
           key={member.name}
           initial={{ opacity: 0, y: 60, scale: 0.95 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true }}
           transition={{ delay: index * 0.15, duration: 0.7, type: "spring" }}
           className="flex justify-center px-4 sm:px-5 lg:px-6"> {/* Increased side padding to match gap */}
@@ -385,7 +367,7 @@ export default function AboutUsPage() {
               whileInView={{ scale: 1 }}
               viewport={{ once: true }}
               transition={{ type: "spring", delay: 0.2 }}
-              className="inline-flex items-center gap-4 sm:gap-6 px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl border border-[#FF6C0C] bg-black/50 backdrop-blur-xl mb-6 sm:mb-8"
+              className="inline-flex items-center gap-4 sm:gap-6 px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl border border-[#FF6C0C] backdrop-blur-xl mb-6 sm:mb-8"
             >
               <Terminal className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-[#FF6C0C]" />
               <span className="text-lg sm:text-xl md:text-2xl font-bold text-[#FF6C0C] tracking-widest">OPERATIONAL NEXUS</span>
@@ -417,7 +399,7 @@ export default function AboutUsPage() {
         <motion.div
           key={director.name}
           initial={{ opacity: 0, y: 40, scale: 0.9 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true }}
           transition={{ delay: index * 0.1, duration: 0.6 }}
           className="flex justify-center px-4 sm:px-5 lg:px-6"> {/* Increased side padding to match gap */}
@@ -542,7 +524,6 @@ function NinjaPhilosophyGrid() {
   className="
     absolute inset-0 
     rounded-3xl 
-    bg-black/40 
     backdrop-blur-xl 
     border border-orange-500/10 
     shadow-[0_8px_30px_rgba(0,0,0,0.35)]
@@ -617,7 +598,7 @@ function NinjaMantra() {
           whileHover={{ scale: 1.1, y: -5 }}
           className="flex items-center gap-1 sm:gap-2"
         >
-          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#FF6C0C] rounded-full" />
+          {/* <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#FF6C0C]" /> */}
           <span className="text-[#FF6C0C] font-bold text-sm sm:text-lg tracking-widest">{word}</span>
           {index < words.length - 1 && (
             <motion.div
@@ -640,6 +621,9 @@ function EnhancedPillarCard({ member, index, onClick }: any) {
     <motion.div
       whileHover={{ scale: 1.03, y: -10 }}
       className="relative group cursor-pointer h-full min-h-[500px] sm:min-h-[550px] md:min-h-[600px] bg-gradient-to-br from-black to-gray-900 border-2 border-white/10 rounded-2xl sm:rounded-3xl overflow-hidden border-[#FF6C0C]/30 hover:border-[#FF6C0C] transition-all duration-700 flex flex-col shadow-2xl shadow-black/50 w-full mx-auto" // Removed mx-1 sm:mx-2, added mx-auto
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={onClick}
     >
       {/* Image Container */}
       <motion.div
@@ -853,17 +837,18 @@ function EnhancedDirectorPopup({ director, onClose }: any) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center p-4 overflow-y-auto"
       onClick={onClose}
     >
-      <motion.div
-        initial={{ scale: 0.8, opacity: 0, rotateX: 15 }}
-        animate={{ scale: 1, opacity: 1, rotateX: 0 }}
-        exit={{ scale: 0.8, opacity: 0, rotateX: 15 }}
-        transition={{ type: "spring", damping: 30, stiffness: 200 }}
-        className="bg-gradient-to-br from-black to-gray-900 border-2 border-[#FF6C0C] rounded-2xl sm:rounded-3xl p-6 sm:p-8 max-w-2xl w-full relative max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="flex items-center justify-center min-h-screen w-full">
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0, rotateX: 15 }}
+          animate={{ scale: 1, opacity: 1, rotateX: 0 }}
+          exit={{ scale: 0.8, opacity: 0, rotateX: 15 }}
+          transition={{ type: "spring", damping: 30, stiffness: 200 }}
+          className="bg-gradient-to-br from-black to-gray-900 border-2 border-[#FF6C0C] rounded-2xl sm:rounded-3xl p-6 sm:p-8 max-w-2xl w-full my-8 relative"
+          onClick={(e) => e.stopPropagation()}
+        >
         <motion.button
           whileHover={{ scale: 1.2, rotate: 90 }}
           whileTap={{ scale: 0.9 }}
@@ -943,6 +928,7 @@ function EnhancedDirectorPopup({ director, onClose }: any) {
           </div>
         </div>
       </motion.div>
+      </div>
     </motion.div>
   );
 }
@@ -956,17 +942,18 @@ function EnhancedLeaderPopup({ leader, onClose }: any) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center p-4 overflow-y-auto"
       onClick={onClose}
     >
-      <motion.div
-        initial={{ scale: 0.8, opacity: 0, rotateX: 15 }}
-        animate={{ scale: 1, opacity: 1, rotateX: 0 }}
-        exit={{ scale: 0.8, opacity: 0, rotateX: 15 }}
-        transition={{ type: "spring", damping: 30, stiffness: 200 }}
-        className="bg-gradient-to-br from-black to-gray-900 border-2 border-[#FF6C0C] rounded-2xl sm:rounded-3xl p-6 sm:p-8 max-w-2xl w-full relative max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="flex items-center justify-center min-h-screen w-full">
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0, rotateX: 15 }}
+          animate={{ scale: 1, opacity: 1, rotateX: 0 }}
+          exit={{ scale: 0.8, opacity: 0, rotateX: 15 }}
+          transition={{ type: "spring", damping: 30, stiffness: 200 }}
+          className="bg-gradient-to-br from-black to-gray-900 border-2 border-[#FF6C0C] rounded-2xl sm:rounded-3xl p-6 sm:p-8 max-w-2xl w-full my-8 relative"
+          onClick={(e) => e.stopPropagation()}
+        >
         <motion.button
           whileHover={{ scale: 1.2, rotate: 90 }}
           whileTap={{ scale: 0.9 }}
@@ -1045,28 +1032,30 @@ function EnhancedLeaderPopup({ leader, onClose }: any) {
           </div>
         </div>
       </motion.div>
+      </div>
     </motion.div>
   );
 }
 
 /* Enhanced Pillar Popup */
 function EnhancedPillarPopup({ pillar, onClose }: any) {
-  return (
+ return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center p-4 overflow-y-auto"
       onClick={onClose}
     >
-      <motion.div
-        initial={{ scale: 0.8, opacity: 0, rotateX: 15 }}
-        animate={{ scale: 1, opacity: 1, rotateX: 0 }}
-        exit={{ scale: 0.8, opacity: 0, rotateX: 15 }}
-        transition={{ type: "spring", damping: 30, stiffness: 200 }}
-        className="bg-gradient-to-br from-black to-gray-900 border-2 border-[#FF6C0C] rounded-2xl sm:rounded-3xl p-6 sm:p-8 max-w-2xl w-full relative max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="flex items-center justify-center min-h-screen w-full">
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0, rotateX: 15 }}
+          animate={{ scale: 1, opacity: 1, rotateX: 0 }}
+          exit={{ scale: 0.8, opacity: 0, rotateX: 15 }}
+          transition={{ type: "spring", damping: 30, stiffness: 200 }}
+          className="bg-gradient-to-br from-black to-gray-900 border-2 border-[#FF6C0C] rounded-2xl sm:rounded-3xl p-6 sm:p-8 max-w-2xl w-full my-8 relative"
+          onClick={(e) => e.stopPropagation()}
+        >
         <motion.button
           whileHover={{ scale: 1.2, rotate: 90 }}
           whileTap={{ scale: 0.9 }}
@@ -1134,6 +1123,7 @@ function EnhancedPillarPopup({ pillar, onClose }: any) {
           </div>
         </div>
       </motion.div>
+      </div>
     </motion.div>
   );
 }
@@ -1155,7 +1145,7 @@ const pillars = [
     bio: "Dr. Chetna Sharma leads Coding Ninjas CUIET with unparalleled passion and commitment to technological advancement. Her innovative teaching methodologies and student-centric approach have revolutionized how coding education is delivered. With expertise in multiple programming paradigms and software development practices, she guides students through complex technical challenges while nurturing their creative potential. Dr. Sharma's leadership has established a vibrant community where students transform into skilled developers, ready to tackle real-world problems with confidence and technical excellence."
   },
   { 
-    name: "Ms. Gagandeep Kaur", 
+    name: "Dr. Gagandeep Kaur", 
     role: "Associate Lead, Coding Ninjas CUIET", 
     img: "/team/gagandeep.png", 
     linkedin: "#",

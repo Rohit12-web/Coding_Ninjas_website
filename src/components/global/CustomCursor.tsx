@@ -57,12 +57,10 @@ export const CustomCursor = () => {
   const targetXRef = useRef(0);
   const targetYRef = useRef(0);
   const rotationRef = useRef(0);
-const trailPointsRef = useRef<TrailPoint[]>([]);
-const animationFrameRef = useRef<number | null>(null);
+  const trailPointsRef = useRef<TrailPoint[]>([]);
+  const animationFrameRef = useRef<number | null>(null);
   const lastMouseXRef = useRef(0);
-  const lastMouseYRef = useRef(0);
-
-  useEffect(() => {
+  const lastMouseYRef = useRef(0);  useEffect(() => {
     const checkMobile = () => {
       const isMobileDevice =
         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -135,6 +133,7 @@ const animationFrameRef = useRef<number | null>(null);
       setIsHovering(isInteractive);
     };
 
+    /* TRAIL EFFECT - COMMENTED OUT FOR PERFORMANCE OPTIMIZATION
     const resizeTrailCanvas = () => {
       const canvas = trailCanvasRef.current;
       if (!canvas) return;
@@ -152,12 +151,15 @@ const animationFrameRef = useRef<number | null>(null);
 
     resizeTrailCanvas();
     window.addEventListener("resize", resizeTrailCanvas);
+    */
 
     const animate = () => {
       if (!cursorRef.current || !cursorInnerRef.current) return;
 
+      /* TRAIL CANVAS - COMMENTED OUT FOR PERFORMANCE
       const canvas = trailCanvasRef.current;
       const ctx = canvas?.getContext("2d", { alpha: true });
+      */
 
       const interpolationFactor = 0.15;
       cursorXRef.current +=
@@ -174,6 +176,7 @@ const animationFrameRef = useRef<number | null>(null);
       cursorRef.current.style.transform = `translate(${cursorXRef.current}px, ${cursorYRef.current}px) translate(-50%, -50%)`;
       cursorInnerRef.current.style.transform = `rotate(${rotationRef.current}deg)`;
 
+      /* TRAIL POINTS - COMMENTED OUT FOR PERFORMANCE
       const dx = cursorXRef.current - lastMouseXRef.current;
       const dy = cursorYRef.current - lastMouseYRef.current;
       const velocity = Math.sqrt(dx * dx + dy * dy);
@@ -256,6 +259,7 @@ const animationFrameRef = useRef<number | null>(null);
           return true;
         });
       }
+      */
 
       animationFrameRef.current = requestAnimationFrame(animate);
     };
@@ -269,7 +273,7 @@ const animationFrameRef = useRef<number | null>(null);
 
     return () => {
       document.body.classList.remove("custom-cursor-active");
-      window.removeEventListener("resize", resizeTrailCanvas);
+      /* window.removeEventListener("resize", resizeTrailCanvas); */ // COMMENTED OUT
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseenter", handleMouseEnter);
       document.removeEventListener("mouseleave", handleMouseLeave);
@@ -287,6 +291,7 @@ const animationFrameRef = useRef<number | null>(null);
 
   return (
     <>
+      {/* TRAIL CANVAS - COMMENTED OUT FOR PERFORMANCE OPTIMIZATION
       <canvas
         ref={trailCanvasRef}
         className="pointer-events-none fixed left-0 top-0 z-[9998]"
@@ -294,6 +299,7 @@ const animationFrameRef = useRef<number | null>(null);
           willChange: "contents",
         }}
       />
+      */}
       <div
         ref={cursorRef}
         className="pointer-events-none fixed left-0 top-0 z-[9999]"
