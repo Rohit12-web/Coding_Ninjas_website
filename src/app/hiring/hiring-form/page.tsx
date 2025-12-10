@@ -12,8 +12,9 @@ interface FormState {
   group: string;
   specialization: string;
   hosteller: "Hosteller" | "Day Scholar";
-  position: string;
+  title: string;
   role: string;
+  team: string;
   resume: File | null;
 }
 
@@ -28,8 +29,9 @@ export default function HiringFormPage() {
     group: "",
     specialization: "",
     hosteller: "Hosteller",
-    position: "",
+    title: "",
     role: "",
+    team: "",
     resume: null,
   });
   const [message, setMessage] = useState("");
@@ -48,8 +50,9 @@ export default function HiringFormPage() {
       const parsed = JSON.parse(selectedRole);
       setForm((prev) => ({
         ...prev,
-        position: parsed.role,
-        role: parsed.title,
+        title: parsed.title || "",
+        role: parsed.role || "",
+        team: parsed.team || "",
       }));
     }
 
@@ -303,13 +306,13 @@ export default function HiringFormPage() {
               </div>
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium text-gray-400">
-                  Position
+                  Opening Title
                 </label>
                 <input
-                  name="position"
+                  name="title"
                   type="text"
-                  placeholder="Position"
-                  value={form.position}
+                  placeholder="Opening Title"
+                  value={form.title}
                   readOnly
                   className="w-full p-4 rounded-xl bg-zinc-900 border border-zinc-700 text-gray-400 placeholder-gray-600 cursor-not-allowed"
                   required
@@ -324,6 +327,20 @@ export default function HiringFormPage() {
                   type="text"
                   placeholder="Role"
                   value={form.role}
+                  readOnly
+                  className="w-full p-4 rounded-xl bg-zinc-900 border border-zinc-700 text-gray-400 placeholder-gray-600 cursor-not-allowed"
+                  required
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-gray-400">
+                  Team
+                </label>
+                <input
+                  name="team"
+                  type="text"
+                  placeholder="Team"
+                  value={form.team}
                   readOnly
                   className="w-full p-4 rounded-xl bg-zinc-900 border border-zinc-700 text-gray-400 placeholder-gray-600 cursor-not-allowed"
                   required

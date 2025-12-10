@@ -58,7 +58,7 @@ export async function PATCH(
           subject: "Welcome Aboard! Your Application is Approved 🎉",
           html: `
             <h1>Congratulations, ${application.name}!</h1>
-            <p>We are thrilled to let you know that your application for the <strong>${application.position} (${application.role})</strong> role has been approved.</p>
+            <p>We are thrilled to let you know that your application for the <strong>${application.role} (${application.team})</strong> role has been approved.</p>
             <p>Welcome to the team! We will contact you soon with the next steps.</p>
             <br/>
             <p>Best regards,</p>

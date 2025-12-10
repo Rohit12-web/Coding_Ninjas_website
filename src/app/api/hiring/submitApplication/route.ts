@@ -41,14 +41,15 @@ export async function POST(req: Request) {
     const group = (formData.get("group") as string)?.trim();
     const specialization = (formData.get("specialization") as string)?.trim();
     const hosteller = (formData.get("hosteller") as string)?.trim();
-    const position = (formData.get("position") as string)?.trim();
+    const title = (formData.get("title") as string)?.trim();
     const role = (formData.get("role") as string)?.trim();
+    const team = (formData.get("team") as string)?.trim();
     const resumeFile = formData.get("resume") as File | null;
 
     /* =========================
        ✅ BASIC VALIDATION
     ========================= */
-    if (!name || !rollNumber || !chitkaraEmail || !position || !role) {
+    if (!name || !rollNumber || !chitkaraEmail || !title || !role || !team) {
       return NextResponse.json(
         { success: false, error: "Missing required fields." },
         { status: 400 },
@@ -133,8 +134,9 @@ export async function POST(req: Request) {
       group,
       specialization,
       hosteller,
-      position,
+      title,
       role,
+      team,
       resumeUrl,
       status: "pending",
     });
@@ -162,7 +164,7 @@ export async function POST(req: Request) {
           subject: "Application Received",
           html: `
             <p>Hi ${name},</p>
-            <p>Your application for <b>${position} (${role})</b> has been received.</p>
+            <p>Your application for <b>${role} (${team})</b> has been received.</p>
             <p>Regards,<br/>CN_CUIET</p>
           `,
         });

@@ -15,8 +15,9 @@ interface Application {
   group: string;
   specialization: string;
   hosteller: string;
-  position: string;
+  title: string;
   role: string;
+  team: string;
   resumeUrl?: string;
   status: "pending" | "approved" | "done"; // Adjusted status type
   createdAt: string;
@@ -26,6 +27,7 @@ interface Application {
 interface Career {
   _id: string;
   title: string;
+  team: string;
   role: string;
 }
 
@@ -130,6 +132,7 @@ export default function AdminDashboard() {
   } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [newCareerTitle, setNewCareerTitle] = useState("");
+  const [newCareerTeam, setNewCareerTeam] = useState("");
   const [newCareerRole, setNewCareerRole] = useState("");
   const [isAddingCareer, setIsAddingCareer] = useState(false);
   const [activeTab, setActiveTab] = useState<"applications" | "openings">(
@@ -143,12 +146,14 @@ export default function AdminDashboard() {
     useState(ITEMS_PER_PAGE);
 
   const [pendingFilter, setPendingFilter] = useState({
+    title: "",
+    team: "",
     role: "",
-    position: "",
   });
   const [completedFilter, setCompletedFilter] = useState({
+    title: "",
+    team: "",
     role: "",
-    position: "",
   });
 
   useEffect(() => {
@@ -178,44 +183,58 @@ export default function AdminDashboard() {
     })();
   }, [router]);
 
+  const pendingTeams = useMemo(
+    () => [...new Set(pendingApplications.map((app) => app.team))],
+    [pendingApplications],
+  );
   const pendingRoles = useMemo(
     () => [...new Set(pendingApplications.map((app) => app.role))],
     [pendingApplications],
   );
-  const pendingPositions = useMemo(
-    () => [...new Set(pendingApplications.map((app) => app.position))],
+  const pendingTitles = useMemo(
+    () => [...new Set(pendingApplications.map((app) => app.title))],
     [pendingApplications],
+  );
+  const completedTeams = useMemo(
+    () => [...new Set(completedApplications.map((app) => app.team))],
+    [completedApplications],
   );
   const completedRoles = useMemo(
     () => [...new Set(completedApplications.map((app) => app.role))],
     [completedApplications],
   );
-  const completedPositions = useMemo(
-    () => [...new Set(completedApplications.map((app) => app.position))],
+  const completedTitles = useMemo(
+    () => [...new Set(completedApplications.map((app) => app.title))],
     [completedApplications],
   );
 
   const filteredPendingApps = useMemo(() => {
     return pendingApplications.filter((app) => {
+      const titleMatch = pendingFilter.title
+        ? app.title === pendingFilter.title
+        : true;
+      const teamMatch = pendingFilter.team
+        ? app.team === pendingFilter.team
+        : true;
       const roleMatch = pendingFilter.role
         ? app.role === pendingFilter.role
         : true;
-      const positionMatch = pendingFilter.position
-        ? app.position === pendingFilter.position
-        : true;
-      return roleMatch && positionMatch;
+      return titleMatch && teamMatch && roleMatch;
     });
   }, [pendingApplications, pendingFilter]);
 
   const filteredCompletedApps = useMemo(() => {
     return completedApplications.filter((app) => {
+      const titleMatch = completedFilter.title
+        ? app.title === completedFilter.title
+        : true;
+      const teamMatch = completedFilter.team
+        ? app.team === completedFilter.team
+        : true;
       const roleMatch = completedFilter.role
         ? app.role === completedFilter.role
         : true;
-      const positionMatch = completedFilter.position
-        ? app.position === completedFilter.position
-        : true;
-      return roleMatch && positionMatch;
+      return titleMatch && teamMatch && roleMatch;
     });
   }, [completedApplications, completedFilter]);
 
@@ -271,18 +290,23 @@ export default function AdminDashboard() {
 
   const handleAddCareer = async (e: FormEvent) => {
     e.preventDefault();
-    if (!newCareerTitle || !newCareerRole) return;
+    if (!newCareerTitle || !newCareerTeam || !newCareerRole) return;
     setIsAddingCareer(true);
     try {
       const res = await fetch("/api/hiring/admin/careers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ title: newCareerTitle, role: newCareerRole }),
+        body: JSON.stringify({
+          title: newCareerTitle,
+          team: newCareerTeam,
+          role: newCareerRole,
+        }),
       });
       const data = await res.json();
       if (data.success) {
         setNewCareerTitle("");
+        setNewCareerTeam("");
         setNewCareerRole("");
         fetchCareers();
       } else {
@@ -420,10 +444,13 @@ export default function AdminDashboard() {
                 Accom.
               </th>
               <th className="px-4 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                Position
+                Opening
               </th>
               <th className="px-4 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                 Role
+              </th>
+              <th className="px-4 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                Team
               </th>
               <th className="px-4 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                 Resume
@@ -479,10 +506,13 @@ export default function AdminDashboard() {
                     {app.hosteller}
                   </td>
                   <td className="px-4 py-4 text-sm text-white whitespace-nowrap">
-                    {app.position}
+                    {app.title}
                   </td>
                   <td className="px-4 py-4 text-sm text-white whitespace-nowrap">
                     {app.role}
+                  </td>
+                  <td className="px-4 py-4 text-sm text-white whitespace-nowrap">
+                    {app.team}
                   </td>
                   <td className="px-4 py-4 text-sm text-white">
                     {app.resumeUrl ? (
@@ -627,6 +657,40 @@ export default function AdminDashboard() {
                       </div>
                       <div className="flex items-center gap-4">
                         <select
+                          value={pendingFilter.title}
+                          onChange={(e) =>
+                            setPendingFilter((prev) => ({
+                              ...prev,
+                              title: e.target.value,
+                            }))
+                          }
+                          className="bg-zinc-800 border-zinc-700 border text-white text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5"
+                        >
+                          <option value="">All Openings</option>
+                          {pendingTitles.map((title) => (
+                            <option key={title} value={title}>
+                              {title}
+                            </option>
+                          ))}
+                        </select>
+                        <select
+                          value={pendingFilter.team}
+                          onChange={(e) =>
+                            setPendingFilter((prev) => ({
+                              ...prev,
+                              team: e.target.value,
+                            }))
+                          }
+                          className="bg-zinc-800 border-zinc-700 border text-white text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5"
+                        >
+                          <option value="">All Teams</option>
+                          {pendingTeams.map((team) => (
+                            <option key={team} value={team}>
+                              {team}
+                            </option>
+                          ))}
+                        </select>
+                        <select
                           value={pendingFilter.role}
                           onChange={(e) =>
                             setPendingFilter((prev) => ({
@@ -640,23 +704,6 @@ export default function AdminDashboard() {
                           {pendingRoles.map((role) => (
                             <option key={role} value={role}>
                               {role}
-                            </option>
-                          ))}
-                        </select>
-                        <select
-                          value={pendingFilter.position}
-                          onChange={(e) =>
-                            setPendingFilter((prev) => ({
-                              ...prev,
-                              position: e.target.value,
-                            }))
-                          }
-                          className="bg-zinc-800 border-zinc-700 border text-white text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5"
-                        >
-                          <option value="">All Positions</option>
-                          {pendingPositions.map((pos) => (
-                            <option key={pos} value={pos}>
-                              {pos}
                             </option>
                           ))}
                         </select>
@@ -716,6 +763,40 @@ export default function AdminDashboard() {
                       </div>
                       <div className="flex items-center gap-4">
                         <select
+                          value={completedFilter.title}
+                          onChange={(e) =>
+                            setCompletedFilter((prev) => ({
+                              ...prev,
+                              title: e.target.value,
+                            }))
+                          }
+                          className="bg-zinc-800 border-zinc-700 border text-white text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5"
+                        >
+                          <option value="">All Openings</option>
+                          {completedTitles.map((title) => (
+                            <option key={title} value={title}>
+                              {title}
+                            </option>
+                          ))}
+                        </select>
+                        <select
+                          value={completedFilter.team}
+                          onChange={(e) =>
+                            setCompletedFilter((prev) => ({
+                              ...prev,
+                              team: e.target.value,
+                            }))
+                          }
+                          className="bg-zinc-800 border-zinc-700 border text-white text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5"
+                        >
+                          <option value="">All Teams</option>
+                          {completedTeams.map((team) => (
+                            <option key={team} value={team}>
+                              {team}
+                            </option>
+                          ))}
+                        </select>
+                        <select
                           value={completedFilter.role}
                           onChange={(e) =>
                             setCompletedFilter((prev) => ({
@@ -729,23 +810,6 @@ export default function AdminDashboard() {
                           {completedRoles.map((role) => (
                             <option key={role} value={role}>
                               {role}
-                            </option>
-                          ))}
-                        </select>
-                        <select
-                          value={completedFilter.position}
-                          onChange={(e) =>
-                            setCompletedFilter((prev) => ({
-                              ...prev,
-                              position: e.target.value,
-                            }))
-                          }
-                          className="bg-zinc-800 border-zinc-700 border text-white text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5"
-                        >
-                          <option value="">All Positions</option>
-                          {completedPositions.map((pos) => (
-                            <option key={pos} value={pos}>
-                              {pos}
                             </option>
                           ))}
                         </select>
@@ -819,14 +883,42 @@ export default function AdminDashboard() {
                             className="w-full p-3 rounded-xl bg-black border border-zinc-700 focus:border-orange-500 focus:outline-none text-white placeholder-gray-600 transition-all duration-300"
                             required
                           />
-                          <input
-                            type="text"
+                          <select
+                            value={newCareerTeam}
+                            onChange={(e) => setNewCareerTeam(e.target.value)}
+                            className="w-full p-3 rounded-xl bg-black border border-zinc-700 focus:border-orange-500 focus:outline-none text-white transition-all duration-300"
+                            required
+                          >
+                            <option value="">Select Team</option>
+                            {[
+                              "Content+Documentation",
+                              "Events",
+                              "Graphics",
+                              "Hr(Human Resource)",
+                              "Logistics+Marketing",
+                              "Media",
+                              "Outreach",
+                              "Social Media",
+                              "Technical",
+                            ].map((team) => (
+                              <option key={team} value={team}>
+                                {team}
+                              </option>
+                            ))}
+                          </select>
+                          <select
                             value={newCareerRole}
                             onChange={(e) => setNewCareerRole(e.target.value)}
-                            placeholder="Enter Role (e.g., Executive)"
-                            className="w-full p-3 rounded-xl bg-black border border-zinc-700 focus:border-orange-500 focus:outline-none text-white placeholder-gray-600 transition-all duration-300"
+                            className="w-full p-3 rounded-xl bg-black border border-zinc-700 focus:border-orange-500 focus:outline-none text-white transition-all duration-300"
                             required
-                          />
+                          >
+                            <option value="">Select Role</option>
+                            {["Executive", "Head"].map((role) => (
+                              <option key={role} value={role}>
+                                {role}
+                              </option>
+                            ))}
+                          </select>
                           <button
                             type="submit"
                             disabled={isAddingCareer}
@@ -849,12 +941,15 @@ export default function AdminDashboard() {
                                 key={career._id}
                                 className="flex items-center justify-between bg-zinc-900 p-4 rounded-lg"
                               >
-                                <div>
-                                  <p className="font-bold text-white">
+                                <div className="flex-1">
+                                  <p className="font-bold text-white text-lg">
                                     {career.title}
                                   </p>
+                                  <p className="text-sm text-gray-400 mt-1">
+                                    Team: {career.team}
+                                  </p>
                                   <p className="text-sm text-gray-400">
-                                    {career.role}
+                                    Role: {career.role}
                                   </p>
                                 </div>
                                 <button

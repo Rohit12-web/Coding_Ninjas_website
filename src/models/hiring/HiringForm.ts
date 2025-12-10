@@ -11,8 +11,9 @@ export interface IHiringForm extends Document {
   group: string;
   specialization: string;
   hosteller: "Hosteller" | "Day Scholar";
-  position: string;
+  title: string;
   role: string;
+  team: string;
   resumeUrl?: string;
   status: "pending" | "approved"; // ✅ Add status here
   createdAt: Date;
@@ -40,8 +41,9 @@ const HiringFormSchema = new Schema<IHiringForm>(
       enum: ["Hosteller", "Day Scholar"],
       required: true,
     },
-    position: { type: String, required: true, trim: true },
+    title: { type: String, required: true, trim: true },
     role: { type: String, required: true, trim: true },
+    team: { type: String, required: true, trim: true },
     resumeUrl: { type: String, default: "" },
     status: { type: String, enum: ["pending", "approved"], default: "pending" },
   },
@@ -49,5 +51,8 @@ const HiringFormSchema = new Schema<IHiringForm>(
 );
 
 // 3️⃣ Export Mongoose model
-export const HiringForm =
-  models.HiringForm || model<IHiringForm>("HiringForm", HiringFormSchema);
+// Delete the cached model to ensure schema updates are applied
+if (models.HiringForm) {
+  delete models.HiringForm;
+}
+export const HiringForm = model<IHiringForm>("HiringForm", HiringFormSchema);

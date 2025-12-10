@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 interface Opening {
   _id: string;
   title: string;
+  team: string;
   role: string;
 }
 
@@ -47,7 +48,11 @@ export default function CareersPage() {
     setInterestedIds([...interestedIds, opening._id]);
     localStorage.setItem(
       "selectedRole",
-      JSON.stringify({ title: opening.title, role: opening.role }),
+      JSON.stringify({
+        title: opening.title,
+        team: opening.team,
+        role: opening.role,
+      }),
     );
 
     router.push(hasToken ? "/hiring/hiring-form" : "/hiring/signin");
@@ -224,7 +229,14 @@ export default function CareersPage() {
                 <h2 className="text-2xl md:text-3xl font-black text-white group-hover:text-orange-500 transition-colors duration-300 tracking-tight mt-4">
                   {opening.title}
                 </h2>
-                <p className="text-gray-400 font-medium">{opening.role}</p>
+                <div className="flex flex-col gap-1">
+                  <p className="text-gray-400 font-medium text-sm">
+                    <span className="text-gray-500">Team:</span> {opening.team}
+                  </p>
+                  <p className="text-gray-400 font-medium text-sm">
+                    <span className="text-gray-500">Role:</span> {opening.role}
+                  </p>
+                </div>
 
                 <div className="flex-grow" />
 

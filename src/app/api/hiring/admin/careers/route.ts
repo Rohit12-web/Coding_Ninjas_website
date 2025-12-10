@@ -5,17 +5,17 @@ import { Career } from "@/models/hiring/Career";
 // Handles POST requests to /api/admin/careers to add a new career
 export async function POST(req: Request) {
   try {
-    const { title, role } = await req.json();
+    const { title, team, role } = await req.json();
 
-    if (!title || !role) {
+    if (!title || !team || !role) {
       return NextResponse.json(
-        { success: false, error: "Title and role are required fields" },
+        { success: false, error: "Title, team, and role are required fields" },
         { status: 400 },
       );
     }
 
     await connectDB();
-    const newCareer = await Career.create({ title, role });
+    const newCareer = await Career.create({ title, team, role });
 
     return NextResponse.json(
       { success: true, career: newCareer },
