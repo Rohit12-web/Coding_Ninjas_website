@@ -6,28 +6,108 @@ export default function SignupPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (resendTimer > 0) {
+      const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendTimer]);
+
+  const handleSendOtp = async () => {
+    setError("");
+    setSuccess("");
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@chitkara\.edu\.in$/;
+    if (!emailRegex.test(email)) {
+      setError("Only @chitkara.edu.in emails are allowed.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const res = await fetch("/api/hiring/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Failed to send OTP");
+      } else {
+        setSuccess("OTP sent to your email!");
+        setOtpSent(true);
+        setResendTimer(60); // 60 seconds cooldown
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Failed to send OTP. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    setError("");
+    setSuccess("");
+
+    if (otp.length !== 6) {
+      setError("Please enter a valid 6-digit OTP.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const res = await fetch("/api/hiring/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code: otp }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Invalid OTP");
+      } else {
+        setSuccess("Email verified successfully!");
+        setOtpVerified(true);
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Failed to verify OTP. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
-    if (!fullName.trim()) {
-      setError("Full Name is required.");
+    if (!otpVerified) {
+      setError("Please verify your email with OTP first.");
       return;
     }
 
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@chitkara\.edu\.in$/;
-    if (!emailRegex.test(email)) {
-      setError("Only @chitkara.edu.in emails are allowed.");
+    if (!fullName.trim()) {
+      setError("Full Name is required.");
       return;
     }
 
@@ -120,6 +200,85 @@ export default function SignupPage() {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+              {/* Email */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-gray-400">
+                  Email Address
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="yourname@chitkara.edu.in"
+                    disabled={otpVerified}
+                    className="flex-1 p-4 rounded-xl bg-black border border-zinc-700 focus:border-orange-500 focus:outline-none text-white placeholder-gray-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                  {!otpVerified && (
+                    <button
+                      type="button"
+                      onClick={handleSendOtp}
+                      disabled={loading || resendTimer > 0 || otpSent}
+                      className="px-6 py-4 rounded-xl font-semibold text-black bg-orange-500 hover:bg-orange-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                    >
+                      {resendTimer > 0
+                        ? `Resend (${resendTimer}s)`
+                        : otpSent
+                          ? "Sent"
+                          : "Send OTP"}
+                    </button>
+                  )}
+                  {otpVerified && (
+                    <div className="px-6 py-4 rounded-xl bg-green-500/20 border border-green-500 flex items-center gap-2">
+                      <span className="text-green-500 font-semibold">
+                        ✓ Verified
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* OTP Input */}
+              {otpSent && !otpVerified && (
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-gray-400">
+                    Enter OTP
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      required
+                      value={otp}
+                      onChange={(e) =>
+                        setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
+                      }
+                      placeholder="123456"
+                      maxLength={6}
+                      className="flex-1 p-4 rounded-xl bg-black border border-zinc-700 focus:border-orange-500 focus:outline-none text-white placeholder-gray-600 transition-all duration-300 text-center text-2xl tracking-widest"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleVerifyOtp}
+                      disabled={loading || otp.length !== 6}
+                      className="px-6 py-4 rounded-xl font-semibold text-black bg-white hover:bg-orange-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                    >
+                      Verify
+                    </button>
+                  </div>
+                  {resendTimer === 0 && (
+                    <button
+                      type="button"
+                      onClick={handleSendOtp}
+                      disabled={loading}
+                      className="text-sm text-orange-500 hover:text-orange-400 transition-colors text-left"
+                    >
+                      Resend OTP
+                    </button>
+                  )}
+                </div>
+              )}
+
               {/* Full Name */}
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium text-gray-400">
@@ -131,22 +290,8 @@ export default function SignupPage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="John Doe"
-                  className="w-full p-4 rounded-xl bg-black border border-zinc-700 focus:border-orange-500 focus:outline-none text-white placeholder-gray-600 transition-all duration-300"
-                />
-              </div>
-
-              {/* Email */}
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-gray-400">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="yourname@chitkara.edu.in"
-                  className="w-full p-4 rounded-xl bg-black border border-zinc-700 focus:border-orange-500 focus:outline-none text-white placeholder-gray-600 transition-all duration-300"
+                  disabled={!otpVerified}
+                  className="w-full p-4 rounded-xl bg-black border border-zinc-700 focus:border-orange-500 focus:outline-none text-white placeholder-gray-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>
 
@@ -161,7 +306,8 @@ export default function SignupPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full p-4 rounded-xl bg-black border border-zinc-700 focus:border-orange-500 focus:outline-none text-white placeholder-gray-600 transition-all duration-300"
+                  disabled={!otpVerified}
+                  className="w-full p-4 rounded-xl bg-black border border-zinc-700 focus:border-orange-500 focus:outline-none text-white placeholder-gray-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>
 
@@ -182,7 +328,7 @@ export default function SignupPage() {
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !otpVerified}
                 className="w-full py-4 rounded-xl font-semibold text-black bg-white hover:bg-orange-500 shadow-lg hover:shadow-orange-500/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02]"
               >
                 {loading ? "Creating Account..." : "Sign Up"}

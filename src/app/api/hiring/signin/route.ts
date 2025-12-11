@@ -10,11 +10,16 @@ const JWT_SECRET = new TextEncoder().encode(
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json();
+    const { email, password, loginWithOtp } = await req.json();
 
-    if (!email || !password) {
+    if (!email) {
+      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    }
+
+    // If logging in with OTP, skip password validation
+    if (!loginWithOtp && !password) {
       return NextResponse.json(
-        { error: "Email and password are required" },
+        { error: "Password is required" },
         { status: 400 },
       );
     }
@@ -28,15 +33,18 @@ export async function POST(req: NextRequest) {
         { status: 401 },
       );
 
-    const isPasswordValid = await bcrypt.compare(
-      password,
-      existingUser.password,
-    );
-    if (!isPasswordValid)
-      return NextResponse.json(
-        { error: "Invalid credentials" },
-        { status: 401 },
+    // For OTP login, skip password check (OTP already verified on frontend)
+    if (!loginWithOtp) {
+      const isPasswordValid = await bcrypt.compare(
+        password,
+        existingUser.password,
       );
+      if (!isPasswordValid)
+        return NextResponse.json(
+          { error: "Invalid credentials" },
+          { status: 401 },
+        );
+    }
 
     const token = await new SignJWT({
       userId: existingUser._id.toString(),

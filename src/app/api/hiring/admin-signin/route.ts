@@ -12,43 +12,59 @@ const USER_SECRET = new TextEncoder().encode(
 
 export async function POST(req: Request) {
   try {
-    const { email, password } = await req.json();
+    const { email, password, loginWithOtp } = await req.json();
 
-    if (!email || !password) {
+    if (!email) {
+      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    }
+
+    // If logging in with OTP, skip password validation
+    if (!loginWithOtp && !password) {
       return NextResponse.json(
-        { error: "Email and password are required" },
+        { error: "Password is required" },
         { status: 400 },
       );
     }
 
-    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-      const token = await new SignJWT({ role: "admin", email })
-        .setProtectedHeader({ alg: "HS256" })
-        .setExpirationTime("2h")
-        .sign(USER_SECRET); // Use the unified secret here
-
-      const res = NextResponse.json(
-        { message: "Admin signed in successfully" },
-        { status: 200 },
-      );
-
-      // --- CHANGE #2: Set the cookie name to "token" ---
-      // This matches what your middleware is looking for.
-      res.cookies.set("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 2 * 60 * 60, // 2 hours
-        path: "/",
-      });
-
-      return res;
+    // For OTP login, only verify email matches admin
+    if (loginWithOtp) {
+      if (email !== ADMIN_EMAIL) {
+        return NextResponse.json(
+          { error: "Invalid admin credentials" },
+          { status: 401 },
+        );
+      }
+    } else {
+      // For password login, verify both email and password
+      if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
+        return NextResponse.json(
+          { error: "Invalid admin credentials" },
+          { status: 401 },
+        );
+      }
     }
 
-    return NextResponse.json(
-      { error: "Invalid admin credentials" },
-      { status: 401 },
+    const token = await new SignJWT({ role: "admin", email })
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("2h")
+      .sign(USER_SECRET); // Use the unified secret here
+
+    const res = NextResponse.json(
+      { message: "Admin signed in successfully" },
+      { status: 200 },
     );
+
+    // --- CHANGE #2: Set the cookie name to "token" ---
+    // This matches what your middleware is looking for.
+    res.cookies.set("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 2 * 60 * 60, // 2 hours
+      path: "/",
+    });
+
+    return res;
   } catch (err) {
     console.error("Admin signin error:", err);
     return NextResponse.json(
