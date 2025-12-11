@@ -23,7 +23,6 @@ export const navigationLinks = [
   { label: "Home", href: "/" },
   { label: "About Us", href: "/about" },
   { label: "Events", href: "/events" },
-  { label: "Hiring", href: "/hiring" },
   { label: "Contact", href: "/contact" },
   { label: "Credits", href: "/credits" },
 ];

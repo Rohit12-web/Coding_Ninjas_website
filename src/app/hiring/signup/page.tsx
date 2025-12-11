@@ -54,11 +54,35 @@ export default function SignupPage() {
       if (!res.ok) {
         setError(data.error || "Signup failed");
       } else {
-        setSuccess("Signed up successfully!");
-        setFullName("");
-        setEmail("");
-        setPassword("");
+        setSuccess("Signed up successfully! Redirecting...");
 
+        // try to automatically sign the user in so they don't need to re-enter credentials
+        try {
+          const signinRes = await fetch("/api/hiring/signin", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ email, password }),
+          });
+
+          if (signinRes.ok) {
+            // clear form and navigate to hiring page (careers) so they can select a role
+            setFullName("");
+            setEmail("");
+            setPassword("");
+            // Trigger a window event so Header can refetch user immediately
+            window.dispatchEvent(new Event("user-signin"));
+            // Wait a moment before redirecting so header can detect user
+            setTimeout(() => {
+              window.location.href = "/hiring";
+            }, 300);
+            return;
+          }
+        } catch (err) {
+          console.error("Auto signin failed:", err);
+        }
+
+        // fallback: send user to signin page
         setTimeout(() => {
           window.location.href = "/hiring/signin";
         }, 1000);

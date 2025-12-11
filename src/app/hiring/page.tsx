@@ -20,10 +20,21 @@ export default function CareersPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("token="));
-    setHasToken(!!token);
+    // Check if user is logged in by calling /api/hiring/me
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/hiring/me", { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          setHasToken(!!data.user);
+        } else {
+          setHasToken(false);
+        }
+      } catch (error) {
+        console.error("Failed to check auth", error);
+        setHasToken(false);
+      }
+    };
 
     const fetchCareers = async () => {
       try {
@@ -31,7 +42,19 @@ export default function CareersPage() {
           cache: "no-store",
         });
         const data = await res.json();
-        if (data.success) setOpenings(data.careers);
+        if (data.success) {
+          const sortedOpenings = [...data.careers].sort((a, b) => {
+            // First, sort by role: "Head" comes before "Executive"
+            if (a.role !== b.role) {
+              if (a.role === "Head" && b.role === "Executive") return -1;
+              if (a.role === "Executive" && b.role === "Head") return 1;
+              return 0;
+            }
+            // Then, sort alphabetically by title within the same role
+            return a.title.localeCompare(b.title);
+          });
+          setOpenings(sortedOpenings);
+        }
       } catch (error) {
         console.error("Failed to fetch careers", error);
       } finally {
@@ -39,6 +62,7 @@ export default function CareersPage() {
       }
     };
 
+    checkAuth();
     fetchCareers();
   }, []);
 
@@ -84,7 +108,7 @@ export default function CareersPage() {
     // REMOVED bg-black so it uses your site's background
     <div className="min-h-screen relative overflow-hidden">
       {/* ================= HERO ================= */}
-      <section className="relative px-6 pt-6 pb-32 z-10">
+      <section className="relative px-6 pt-6 pb-8 z-10">
         <div className="max-w-7xl mx-auto text-center">
           {/* Badge */}
           <motion.div
@@ -137,62 +161,10 @@ export default function CareersPage() {
             career leap starts here.
           </motion.p>
         </div>
-
-        {/* ================= FEATURE CARDS (WITH SHINE) ================= */}
-        <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {[
-            {
-              Icon: Rocket,
-              title: "Fast Growth",
-              desc: "Work on meaningful products that scale globally.",
-            },
-            {
-              Icon: Lightbulb,
-              title: "Smart People",
-              desc: "Collaborate with engineers, designers & thinkers.",
-            },
-            {
-              Icon: Target,
-              title: "Real Impact",
-              desc: "Your work directly shapes the company’s future.",
-            },
-          ].map((item, i) => (
-            <motion.div
-              key={i}
-              initial="rest"
-              whileHover="hover" // Triggers the 'hover' variant on children
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="relative group overflow-hidden bg-zinc-900/80 backdrop-blur-xl border border-zinc-800 hover:border-orange-500/50 rounded-3xl p-6 md:p-8 transition-colors duration-300"
-            >
-              {/* === SHINE ELEMENT === */}
-              <motion.div
-                variants={shineVariants}
-                className="absolute inset-0 z-0 pointer-events-none"
-                style={{
-                  background:
-                    "linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.1) 40%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 60%, transparent 80%)",
-                }}
-              />
-
-              {/* Content */}
-              <div className="relative z-10">
-                <item.Icon className="w-9 h-9 text-orange-400 mb-5 group-hover:scale-110 transition-transform duration-300" />
-                <h3 className="text-white text-lg md:text-xl font-bold mb-2">
-                  {item.title}
-                </h3>
-                <p className="text-gray-400 text-sm md:text-base leading-relaxed">
-                  {item.desc}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
       </section>
 
       {/* ================= JOB HEADING ================= */}
-      <section className="relative z-10 px-6 pt-10 pb-16">
+      <section className="relative z-10 px-6  pb-16">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-8 mb-4">
             <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-orange-500/50 to-orange-500/80" />

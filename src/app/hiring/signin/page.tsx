@@ -56,12 +56,19 @@ export default function SigninPage() {
         return;
       }
 
-      // Redirect based on endpoint (client routes under /hiring)
-      if (endpoint === "/api/hiring/admin-signin") {
-        router.push("/hiring/admin");
-      } else {
-        router.push("/hiring/hiring-form");
-      }
+      // Trigger a window event so Header can refetch user immediately
+      window.dispatchEvent(new Event("user-signin"));
+
+      // Wait a moment then redirect
+      setTimeout(() => {
+        // Redirect based on endpoint (client routes under /hiring)
+        if (endpoint === "/api/hiring/admin-signin") {
+          router.push("/hiring/admin");
+        } else {
+          // Regular user: go to careers page so they can select a role first
+          router.push("/hiring");
+        }
+      }, 300);
     } catch (err) {
       console.error(err);
       setError("Something went wrong. Please try again.");

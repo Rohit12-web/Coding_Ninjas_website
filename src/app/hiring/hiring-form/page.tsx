@@ -42,6 +42,9 @@ export default function HiringFormPage() {
 
   useEffect(() => {
     setMounted(true);
+    // Clear any previous messages when component mounts
+    setMessage("");
+    setMessageType("");
   }, []);
 
   useEffect(() => {

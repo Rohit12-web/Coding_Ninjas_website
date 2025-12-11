@@ -281,7 +281,17 @@ export default function AdminDashboard() {
       });
       const data = await res.json();
       if (data.success) {
-        setCareers(data.careers);
+        const sortedCareers = [...data.careers].sort((a, b) => {
+          // First, sort by role: "Head" comes before "Executive"
+          if (a.role !== b.role) {
+            if (a.role === "Head" && b.role === "Executive") return -1;
+            if (a.role === "Executive" && b.role === "Head") return 1;
+            return 0;
+          }
+          // Then, sort alphabetically by title within the same role
+          return a.title.localeCompare(b.title);
+        });
+        setCareers(sortedCareers);
       }
     } catch (err) {
       console.error(err);
@@ -879,7 +889,7 @@ export default function AdminDashboard() {
                             type="text"
                             value={newCareerTitle}
                             onChange={(e) => setNewCareerTitle(e.target.value)}
-                            placeholder="Enter Title (e.g., Outreach)"
+                            placeholder="Enter Title"
                             className="w-full p-3 rounded-xl bg-black border border-zinc-700 focus:border-orange-500 focus:outline-none text-white placeholder-gray-600 transition-all duration-300"
                             required
                           />
