@@ -2,15 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 
-interface TrailPoint {
-  x: number;
-  y: number;
-  alpha: number;
-  size: number;
-  vx: number;
-  vy: number;
-}
-
 const SHURIKEN_SIZE = 24;
 
 const ShurikenSVG = ({ className }: { className?: string }) => (
@@ -46,7 +37,6 @@ const ShurikenSVG = ({ className }: { className?: string }) => (
 export const CustomCursor = () => {
   const cursorRef = useRef<HTMLDivElement>(null);
   const cursorInnerRef = useRef<HTMLDivElement>(null);
-  const trailCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isHovering, setIsHovering] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -57,10 +47,11 @@ export const CustomCursor = () => {
   const targetXRef = useRef(0);
   const targetYRef = useRef(0);
   const rotationRef = useRef(0);
-  const trailPointsRef = useRef<TrailPoint[]>([]);
   const animationFrameRef = useRef<number | null>(null);
   const lastMouseXRef = useRef(0);
-  const lastMouseYRef = useRef(0);  useEffect(() => {
+  const lastMouseYRef = useRef(0);
+  const throttleRef = useRef(false);
+  useEffect(() => {
     const checkMobile = () => {
       const isMobileDevice =
         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -70,6 +61,19 @@ export const CustomCursor = () => {
         window.innerWidth < 768;
       setIsMobile(isMobileDevice);
       return isMobileDevice;
+    };
+
+    const checkLowEndDevice = () => {
+      const cpuCores = navigator.hardwareConcurrency || 4;
+      const deviceMemory =
+        (navigator as unknown as { deviceMemory?: number }).deviceMemory || 4;
+
+      // Disable on devices with < 4 CPU cores or < 4GB RAM
+      if (cpuCores < 4 || deviceMemory < 4) {
+        setIsMobile(true); // Reuse mobile flag to disable cursor
+        return true;
+      }
+      return false;
     };
 
     const checkReducedMotion = () => {
@@ -87,10 +91,11 @@ export const CustomCursor = () => {
     };
 
     const isMobileDevice = checkMobile();
+    const isLowEnd = checkLowEndDevice();
     const { cleanup: cleanupReducedMotion, reduced: prefersReduced } =
       checkReducedMotion();
 
-    if (isMobileDevice || prefersReduced) {
+    if (isMobileDevice || prefersReduced || isLowEnd) {
       return () => {
         cleanupReducedMotion();
       };
@@ -99,6 +104,12 @@ export const CustomCursor = () => {
     document.body.classList.add("custom-cursor-active");
 
     const handleMouseMove = (e: MouseEvent) => {
+      if (throttleRef.current) return;
+      throttleRef.current = true;
+      setTimeout(() => {
+        throttleRef.current = false;
+      }, 16); // ~60fps
+
       if (!isVisible) setIsVisible(true);
 
       targetXRef.current = e.clientX;
@@ -124,7 +135,7 @@ export const CustomCursor = () => {
         target.closest("a") !== null ||
         target.closest("button") !== null ||
         target.closest('[role="button"]') !== null ||
-        target.closest('[data-cursor-hover]') !== null ||
+        target.closest("[data-cursor-hover]") !== null ||
         target.closest(".cursor-pointer") !== null ||
         target.closest("[class*='CTA']") !== null ||
         target.closest("[class*='Card']") !== null ||
@@ -173,7 +184,8 @@ export const CustomCursor = () => {
         if (rotationRef.current >= 360) rotationRef.current = 0;
       }
 
-      cursorRef.current.style.transform = `translate(${cursorXRef.current}px, ${cursorYRef.current}px) translate(-50%, -50%)`;
+      // Use GPU-accelerated transforms only - translate3d for hardware acceleration
+      cursorRef.current.style.transform = `translate3d(${cursorXRef.current}px, ${cursorYRef.current}px, 0) translate(-50%, -50%)`;
       cursorInnerRef.current.style.transform = `rotate(${rotationRef.current}deg)`;
 
       /* TRAIL POINTS - COMMENTED OUT FOR PERFORMANCE
@@ -291,15 +303,6 @@ export const CustomCursor = () => {
 
   return (
     <>
-      {/* TRAIL CANVAS - COMMENTED OUT FOR PERFORMANCE OPTIMIZATION
-      <canvas
-        ref={trailCanvasRef}
-        className="pointer-events-none fixed left-0 top-0 z-[9998]"
-        style={{
-          willChange: "contents",
-        }}
-      />
-      */}
       <div
         ref={cursorRef}
         className="pointer-events-none fixed left-0 top-0 z-[9999]"

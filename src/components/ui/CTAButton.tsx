@@ -1,7 +1,6 @@
 "use client";
 
 import type { Route } from "next";
-import Link from "next/link";
 import { forwardRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -33,7 +32,6 @@ const variants = {
     "text-foreground/80 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
 };
 
-const MotionLink = motion.create(Link);
 const MotionAnchor = motion.create("a");
 
 export const CTAButton = forwardRef<HTMLButtonElement, CTAButtonProps>(
@@ -108,7 +106,9 @@ export const CTAButton = forwardRef<HTMLButtonElement, CTAButtonProps>(
             className={sharedClasses}
             whileHover={{ scale: variant === "ghost" ? 1 : 1.02 }}
             whileTap={{ scale: 0.98 }}
-            target={isExternal && href?.startsWith("http") ? "_blank" : undefined}
+            target={
+              isExternal && href?.startsWith("http") ? "_blank" : undefined
+            }
             rel={
               isExternal && href?.startsWith("http")
                 ? "noopener noreferrer"
