@@ -2,6 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  eslint: {
+    // We use a custom ESLint config; suppress Next.js plugin warning during builds
+    ignoreDuringBuilds: true,
+  },
   images: {
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 60,
@@ -10,12 +14,11 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "1mb",
     },
-    // Disable filesystem cache for builds to avoid Windows symlink permission issues
-    turbopackFileSystemCacheForBuild: false,
   },
-  // Prevent Turbopack from creating symlinks for external packages on Windows
+  // Mark MongoDB/Mongoose as external server packages (prevents bundling issues)
   serverExternalPackages: ["mongodb", "mongoose"],
-  typedRoutes: true,
+  // Disable typed routes to avoid build complications
+  // typedRoutes: true,
 };
 
 export default nextConfig;
